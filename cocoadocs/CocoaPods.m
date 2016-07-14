@@ -218,17 +218,19 @@ static NSString *const XAR_EXECUTABLE = @"/usr/bin/xar";
   NSString *podFilePath = project.podfilePath;
 
   if (![project hasPodfile]) {
-    NSError *error = nil;
-    [[NSFileManager defaultManager]
-        copyItemAtPath:[self.bundle pathForResource:@"DefaultPodfile"
-                                             ofType:@""]
-                toPath:podFilePath
-                 error:&error];
-    if (error) {
-      [[NSAlert alertWithError:error] runModal];
+    NSMutableArray *arguments = [@[ @"init" ] mutableCopy];
+    if ([self shouldInstallUpdateOffline]) {
+      [arguments addObject:@"--no-repo-update"];
     }
+    [self runPodWithArguments:arguments completion:^(NSTask *t) {
+      dispatch_async(dispatch_get_main_queue(), ^{
+        [[[NSApplication sharedApplication] delegate]
+         application:[NSApplication sharedApplication]
+         openFile:podFilePath];
+      });
+    }];
   }
-
+  
   [[[NSApplication sharedApplication] delegate]
       application:[NSApplication sharedApplication]
          openFile:podFilePath];

@@ -1,5 +1,5 @@
 platform :osx
 
-target :CocoaPodsTests, :exclusive => true do
-  pod 'Kiwi'
+target :CocoaPodsTests do
+#  pod 'Kiwi'
 end
